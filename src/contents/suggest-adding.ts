@@ -1,11 +1,13 @@
 import type { PlasmoCSConfig } from "plasmo"
 
+
+
+
+
 export const config: PlasmoCSConfig = {
-  matches: ["https://www.plasmo.com/*"]
+  matches: ["http://localhost:*/*", "http://localhost/*"]
 }
 
 window.addEventListener("load", () => {
-  console.log("content script loaded")
-
-  document.body.style.background = "pink"
+  console.log("You should see this message on localhost")
 })
