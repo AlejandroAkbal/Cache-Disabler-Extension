@@ -64,20 +64,21 @@ function toggleCache() {
     <main class="flex-auto flex flex-col gap-6">
       <!-- Header -->
       <div class="text-center">
-        <h1 class="text-base font-semibold leading-7 text-base-content-highlight">Cache Disabler</h1>
-        <p class="text-sm leading-6 text-base-content">
-          Disable the browser cache for any website. Perfect for developing websites.
+        <h1 class="text-lg font-semibold leading-8 text-base-content-highlight">Cache Disabler</h1>
+        <p class="text-sm leading-5 text-base-content">
+          Ensure the latest changes are always visible during development
         </p>
       </div>
 
       <!-- Form -->
       <form class="block">
-        <label for="toggleCacheOfCurrentWebsite"> Disable cache for this tab </label>
-        <input
-          id="toggleCacheOfCurrentWebsite"
-          :checked="isCurrentSiteDisabled"
-          type="checkbox"
-          @click.prevent="toggleCache" />
+        <input class="hidden peer" id="toggleCacheOfCurrentWebsite" type="checkbox" @click.prevent="toggleCache" />
+
+        <label
+          for="toggleCacheOfCurrentWebsite"
+          class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">
+          Disable cache for this tab
+        </label>
       </form>
 
       <!-- List of hostnames with cache disabled -->
