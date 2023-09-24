@@ -1,14 +1,19 @@
 {
   "name": "cache-disabler",
-  "displayName": "Cache disabler",
+  "displayName": "Cache Disabler",
   "version": "0.0.1",
-  "description": "Disable the browser cache for any website. Perfect for developing websites.",
+  "description": "Ensure you get the latest changes during web development.",
   "author": "Alejandro Akbal",
   "homepage_url": "https://github.com/AlejandroAkbal/Cache-Disabler-Extension",
   "scripts": {
     "dev": "plasmo dev",
-    "build": "plasmo build",
-    "package": "plasmo package"
+    "build": "rm -rf ./build && npm run build:all && npm run package:all",
+    "build:all": "npm run build:firefox && npm run build:chrome",
+    "build:firefox": "plasmo build --target=firefox-mv2",
+    "build:chrome": "plasmo build --target=chrome-mv3",
+    "package:all": "npm run package:firefox && npm run package:chrome",
+    "package:firefox": "plasmo package --target=firefox-mv2",
+    "package:chrome": "plasmo package --target=chrome-mv3"
   },
   "dependencies": {
     "@plasmohq/storage": "^1.8.0",
@@ -34,7 +39,7 @@
   "manifest": {
     "browser_specific_settings": {
       "gecko": {
-        "id": "your-id@example.com"
+        "id": "cache-disabler@akbal.dev"
       }
     },
     "host_permissions": [
