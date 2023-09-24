@@ -1,15 +1,13 @@
-import browser from "webextension-polyfill";
-import { StorageKey, useHostnamesWithCacheDisabled } from "~composables/use-hostnames-with-cache-disabled";
+import browser from 'webextension-polyfill'
+
+import { useHostnamesWithCacheDisabled } from '~composables/use-hostnames-with-cache-disabled'
+
 
 
 
 
 (async () => {
-  // await browser.storage.sync.clear();
-
   const { hostnamesWithCacheDisabled } = useHostnamesWithCacheDisabled()
-
-  hostnamesWithCacheDisabled.value = ["localhost"]
 
   // TODO: On installed, set the default value for hostnamesWithCacheDisabled to []
 
@@ -18,7 +16,7 @@ import { StorageKey, useHostnamesWithCacheDisabled } from "~composables/use-host
    */
   async function clearCache(details: browser.WebRequest.OnBeforeRequestDetailsType) {
     // Skip requests that are not HTTP, like chrome-extension://
-    if (!details.url.startsWith("http")) {
+    if (!details.url.startsWith('http')) {
       return {}
     }
 
@@ -27,27 +25,27 @@ import { StorageKey, useHostnamesWithCacheDisabled } from "~composables/use-host
     // Skip if the initiator is NOT in the list of hostnames with cache disabled
     if (!hostnamesWithCacheDisabled.value.includes(initiatorHostname)) {
       console.debug(
-        "Skipping",
+        'Skipping',
         details.url,
-        "because",
+        'because',
         initiatorHostname,
-        "is not in the list of hostnames with cache disabled"
+        'is not in the list of hostnames with cache disabled'
       )
       return {}
     }
 
     await browser.browsingData.removeCache({})
 
-    console.info("Removed cache for", details.url)
+    console.info('Removed cache for', details.url)
 
     return {}
   }
 
   function main() {
-    console.log("Cache cleaner extension is running")
+    console.log('Cache cleaner extension is running')
 
     browser.webRequest.onBeforeRequest.addListener(clearCache, {
-      urls: ["<all_urls>"]
+      urls: ['<all_urls>']
     })
   }
 

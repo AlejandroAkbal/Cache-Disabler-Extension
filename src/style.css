@@ -9,7 +9,7 @@
 @layer base {
 
     html {
-        @apply bg-base-0 text-base-content;
+        @apply bg-base-50 text-base-content min-h-[500px] min-w-[300px];
     }
 
     /* https://www.joshwcomeau.com/css/custom-css-reset/#five-font-smoothing-6 */
@@ -18,7 +18,7 @@
     }
 
     /* https://www.joshwcomeau.com/css/custom-css-reset/#three-percentage-based-heights-4 */
-    html, body {
+    html, body, #__plasmo {
         @apply h-full;
     }
 }
@@ -33,7 +33,7 @@
     * IN CLASSES IT SHOULD BE USED AS `focus-visible:focus-outline-util`
     */
     .focus-outline-util {
-        @apply outline outline-2 outline-offset-2 outline-base-content-highlight;
+        @apply outline outline-2 outline-base-content-highlight;
     }
 
     /*
@@ -49,7 +49,7 @@
     * IN CLASSES IT SHOULD BE USED AS `hover:hover-bg-util`
      */
     .hover-bg-util {
-        @apply bg-base-0/20;
+        @apply bg-base-1000/10;
     }
 
     /* https://github.com/reslear/tailwind-scrollbar-hide/blob/main/src/index.js */

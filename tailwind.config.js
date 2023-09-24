@@ -1,16 +1,14 @@
-const defaultTheme = require("tailwindcss/defaultTheme")
-const defaultColors = require("tailwindcss/colors")
+const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultColors = require('tailwindcss/colors')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.vue"],
+  content: ['./src/**/*.vue'],
 
   theme: {
     extend: {
       colors: {
-        primary: defaultColors.sky,
-
-        accent: defaultColors.violet,
+        primary: defaultColors.violet,
 
         /**
          * Used for the background
@@ -28,17 +26,17 @@ module.exports = {
         /**
          * Used for text and icons on the background
          */
-        "base-content": {
-          hover: defaultColors.gray[700],
+        'base-content': {
+          hover: defaultColors.gray[900],
 
-          highlight: defaultColors.gray[900],
+          highlight: defaultColors.gray[700],
 
           DEFAULT: defaultColors.gray[500]
         }
       },
 
       fontFamily: {
-        sans: ["Inter var", ...defaultTheme.fontFamily.sans]
+        sans: ['Inter var', ...defaultTheme.fontFamily.sans]
       }
     }
   }

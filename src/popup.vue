@@ -1,103 +1,194 @@
 <script lang="ts" setup>
-import { computed, ComputedRef, onBeforeMount, Ref, ref } from "vue"
-import browser from "webextension-polyfill"
+  import { computed, ComputedRef, onBeforeMount, Ref, ref } from 'vue'
+  import type { Tabs } from 'webextension-polyfill'
+  import browser from 'webextension-polyfill'
 
-import "~style.css"
+  import '~style.css'
 
-import { useHostnamesWithCacheDisabled } from "./composables/use-hostnames-with-cache-disabled"
+  import { useHostnamesWithCacheDisabled } from './composables/use-hostnames-with-cache-disabled'
 
-const { hostnamesWithCacheDisabled } = useHostnamesWithCacheDisabled()
+  const { hostnamesWithCacheDisabled } = useHostnamesWithCacheDisabled()
 
-const browserTabs: Ref<chrome.tabs.Tab[] | null> = ref(null)
+  const browserTabs: Ref<Tabs.Tab[] | null> = ref(null)
 
-onBeforeMount(async () => {
-  const tabs = await browser.tabs.query({
-    active: true,
-    currentWindow: true
+  onBeforeMount(async () => {
+    const tabs = await browser.tabs.query({
+      active: true,
+      currentWindow: true
+    })
+
+    browserTabs.value = tabs
   })
 
-  browserTabs.value = tabs
-})
+  const currentSite: ComputedRef<URL | null> = computed(() => {
+    if (!browserTabs.value?.length || !browserTabs.value[0]) {
+      return null
+    }
 
-const currentSite: ComputedRef<URL | null> = computed(() => {
-  if (!browserTabs.value?.length || !browserTabs.value[0]) {
-    return null
+    return new URL(browserTabs.value[0].url)
+  })
+
+  const isCurrentSiteDisabled: ComputedRef<boolean> = computed(() => {
+    if (currentSite.value === null) {
+      return false
+    }
+
+    return hostnamesWithCacheDisabled.value.includes(currentSite.value.hostname)
+  })
+
+  function toggleCache() {
+    if (currentSite.value == null) {
+      return
+    }
+
+    const currentSiteHostname = currentSite.value.hostname
+    const currentSiteUrl = currentSite.value.toString()
+
+    if (!currentSiteUrl.startsWith('http')) {
+      alert('This extension only works with HTTP and HTTPS websites, "' + currentSiteUrl + '" is not valid')
+      return
+    }
+
+    if (isCurrentSiteDisabled.value) {
+      hostnamesWithCacheDisabled.value = hostnamesWithCacheDisabled.value.filter(
+        (hostname) => hostname !== currentSiteHostname
+      )
+    } else {
+      hostnamesWithCacheDisabled.value = [...hostnamesWithCacheDisabled.value, currentSiteHostname]
+    }
   }
-
-  return new URL(browserTabs.value[0].url)
-})
-
-const isCurrentSiteDisabled: ComputedRef<boolean> = computed(() => {
-  if (currentSite.value === null) {
-    return false
-  }
-
-  return hostnamesWithCacheDisabled.value.includes(currentSite.value.hostname)
-})
-
-function toggleCache() {
-  if (currentSite.value == null) {
-    return
-  }
-
-  const currentSiteHostname = currentSite.value.hostname
-  const currentSiteUrl = currentSite.value.toString()
-
-  if (!currentSiteUrl.startsWith("http")) {
-    alert('This extension only works with HTTP and HTTPS websites, "' + currentSiteUrl + '" is not valid')
-    return
-  }
-
-  if (isCurrentSiteDisabled.value) {
-    hostnamesWithCacheDisabled.value = hostnamesWithCacheDisabled.value.filter(
-      (hostname) => hostname !== currentSiteHostname
-    )
-  } else {
-    hostnamesWithCacheDisabled.value = [...hostnamesWithCacheDisabled.value, currentSiteHostname]
-  }
-}
 </script>
 
 <template>
-  <!-- TODO: Beautiful background with blurry SVGs -->
-  <div class="container min-w-[300px] min-h-[400px] p-4 flex flex-col">
-    <main class="flex-auto flex flex-col gap-6">
+  <div class="container relative flex h-full flex-col gap-12 p-4">
+    <!-- Background -->
+    <div class="absolute inset-0 -z-10 h-full w-full overflow-hidden">
+      <svg
+        style="transform: translate(50%, 35%) scale(1.8)"
+        viewBox="0 0 500 1000"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <!-- Blur -->
+          <filter
+            id="b"
+            filterUnits="userSpaceOnUse"
+            height="2000"
+            width="1000"
+            x="-250"
+            y="-500"
+          >
+            <feGaussianBlur
+              in="SourceGraphic"
+              stdDeviation="30"
+            />
+          </filter>
+
+          <!-- Gradient -->
+          <radialGradient
+            id="c"
+            cx="50%"
+            cy="50%"
+            fx="70%"
+            fy="39%"
+            r="50%"
+          >
+            <!-- Tailwind's indigo[600] -->
+            <stop
+              offset="0%"
+              stop-color="#4f46e5"
+            />
+            <!-- Tailwind's fuchsia[500] -->
+            <stop
+              offset="100%"
+              stop-color="rgba(194,68,247,0.2)"
+            />
+          </radialGradient>
+        </defs>
+
+        <g filter="url(#b)">
+          <svg
+            transform="translate(-56.586 -303.166)"
+            viewBox="0 0 500 500"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M401.5 327.5Q340 405 233.5 434t-141-77.5Q58 250 115.5 183t138-73q80.5-6 145 67t3 150.5Z"
+              fill="url(#c)"
+            />
+          </svg>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Body -->
+    <main class="flex flex-auto flex-col gap-6">
       <!-- Header -->
-      <div class="text-center">
+      <header class="text-center">
         <h1 class="text-lg font-semibold leading-8 text-base-content-highlight">Cache Disabler</h1>
-        <p class="text-sm leading-5 text-base-content">
-          Ensure the latest changes are always visible during development
-        </p>
-      </div>
+        <p class="text-sm leading-5">Ensure you get the latest changes during 🕸 development</p>
+      </header>
 
-      <!-- Form -->
-      <form class="block">
-        <input class="hidden peer" id="toggleCacheOfCurrentWebsite" type="checkbox" @click.prevent="toggleCache" />
+      <section class="my-8">
+        <!-- Form -->
+        <form class="flex">
+          <input
+            id="toggleCacheOfCurrentWebsite"
+            :checked="isCurrentSiteDisabled"
+            class="peer hidden"
+            type="checkbox"
+            @click="toggleCache"
+          />
 
-        <label
-          for="toggleCacheOfCurrentWebsite"
-          class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50">
-          Disable cache for this tab
-        </label>
-      </form>
+          <label
+            class="focus-visible:focus-outline-util w-full cursor-pointer select-none rounded-lg border border-primary-300 bg-primary-200 px-2 py-4 text-center text-sm font-semibold text-primary-800/70 shadow shadow-primary-200 hover:bg-primary-300 peer-checked:border-primary-200 peer-checked:bg-primary-100 peer-checked:hover:bg-primary-200"
+            for="toggleCacheOfCurrentWebsite"
+            tabindex="0"
+            @keyup.space="toggleCache"
+            @keyup.enter="toggleCache"
+          >
+            {{ isCurrentSiteDisabled ? 'Enable' : 'Disable' }}
+            cache for this hostname
+          </label>
+        </form>
+
+        <!-- TODO: Add notice about reloading website if its the first time -->
+      </section>
 
       <!-- List of hostnames with cache disabled -->
-      <div class="flex-auto overflow-y-auto">
-        <p class="text-sm leading-6 text-base-content">
-          There are {{ hostnamesWithCacheDisabled.length }} hostnames with cache disabled
+      <section
+        v-if="hostnamesWithCacheDisabled.length"
+        class="flex-auto"
+      >
+        <p class="flex items-center gap-1 text-sm font-medium">
+          <span class="rounded-full bg-base-200 px-2 py-0.5 text-xs tabular-nums text-base-content-highlight">
+            {{ hostnamesWithCacheDisabled.length }}
+          </span>
+          hostnames with cache disabled
         </p>
 
-        <ul class="list-none">
-          <li v-for="hostname in hostnamesWithCacheDisabled" :key="hostname">
+        <ul class="mt-2 list-none">
+          <li
+            v-for="hostname in hostnamesWithCacheDisabled"
+            :key="hostname"
+          >
             {{ hostname }}
+
+            <!-- TODO: Delete button -->
           </li>
         </ul>
-      </div>
+      </section>
     </main>
 
-    <footer class="flex-none text-xs text-base-content text-center">
-      Made with love by
-      <a class="hover:hover-text-util underline" href="https://akbal.dev">Alejandro Akbal</a>
+    <footer class="flex-none text-center text-xs font-medium text-base-content">
+      Made with <span class="text-base">⌨</span> by
+      <a
+        class="hover:hover-text-util focus-visible:focus-outline-util text-base-content-highlight underline"
+        href="https://akbal.dev"
+        target="_blank"
+      >
+        Alejandro Akbal
+      </a>
     </footer>
   </div>
 </template>
